@@ -1,14 +1,17 @@
 //"use strict";
 
-$(document).ready(function () {
+var snakejs = function () {
     //Canvas stuff
     var canvas = document.getElementById("canvas");
     var ctx = canvas.getContext("2d");
     var w = canvas.width;
     var h = canvas.height;
+    var gw = 45;
+    var gh = 45;
 
     //Lets save the cell width in a variable for easy control
-    var cw = 10;
+    var cw = w / gw;
+    var ch = h / gh;
     var d;
     var food;
     var score;
@@ -20,6 +23,29 @@ $(document).ready(function () {
 
     //Lets create the snake now
     var snake_array; //an array of cells to make up the snake
+
+    var menu = (function () {
+
+    }());
+
+    var snake = (function () {
+        //init
+        //paint
+        //control
+        //collision
+    }());
+
+    var playground = (function () {
+
+        //food
+    }());
+
+    var game = (function () {
+        //playground
+        //menu
+        //snake
+        //run
+    });
 
     function init() {
         d = "right"; //default direction
@@ -49,7 +75,7 @@ $(document).ready(function () {
     function create_food() {
         food = {
             x: Math.round(Math.random() * (w - cw) / cw),
-            y: Math.round(Math.random() * (h - cw) / cw),
+            y: Math.round(Math.random() * (h - ch) / ch)
         };
         //This will create a cell with x/y between 0-44
         //Because there are 45(450/10) positions accross the rows and columns
@@ -58,11 +84,7 @@ $(document).ready(function () {
     //Lets paint the snake now
     function paint() {
         //To avoid the snake trail we need to paint the BG on every frame
-        //Lets paint the canvas now
-        ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, w, h);
-        ctx.strokeStyle = "black";
-        ctx.strokeRect(0, 0, w, h);
+        draw_playground();
 
         //The movement code for the snake to come here.
         //The logic is simple
@@ -81,7 +103,7 @@ $(document).ready(function () {
         //This will restart the game if the snake hits the wall
         //Lets add the code for body collision
         //Now if the head of the snake bumps into its body, the game will restart
-        if (nx == -1 || nx == w / cw || ny == -1 || ny == h / cw || check_collision(nx, ny, snake_array)) {
+        if (check_border_collision(nx, ny) || check_collision(nx, ny, snake_array)) {
             //restart game
             init();
             //Lets organize the code a bit now.
@@ -92,7 +114,7 @@ $(document).ready(function () {
         //The logic is simple
         //If the new head position matches with that of the food,
         //Create a new head instead of moving the tail
-        if (nx == food.x && ny == food.y) {
+        if (check_collision(nx, ny, [food])) {
             var tail = {x: nx, y: ny};
             score++;
             //Create new food
@@ -122,12 +144,19 @@ $(document).ready(function () {
         ctx.fillText(keycode_text, 5, h - 15);
     }
 
+    function draw_playground() {
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, w, h);
+        ctx.strokeStyle = "black";
+        ctx.strokeRect(0, 0, w, h);
+    }
+
     //Lets first create a generic function to paint cells
     function paint_cell(x, y) {
         ctx.fillStyle = "blue";
-        ctx.fillRect(x * cw, y * cw, cw, cw);
+        ctx.fillRect(x * cw, y * ch, cw, ch);
         ctx.strokeStyle = "white";
-        ctx.strokeRect(x * cw, y * cw, cw, cw);
+        ctx.strokeRect(x * cw, y * ch, cw, ch);
     }
 
     function check_collision(x, y, array) {
@@ -140,20 +169,27 @@ $(document).ready(function () {
         return false;
     }
 
-    //Lets add the keyboard controls now
-    $(document).keydown(function (e) {
+    function check_border_collision(x, y) {
+        return x === -1 || x === gw || y === -1 || y === gh;
+    }
+
+    //Lets add the keyboard controls now, via chaining!
+    old_document_keydown = document.onkeydown;
+    document.onkeydown = function (e) {
+        snake_keyboard_controller(e);
+        if (old_document_keydown) old_document_keydown(e);
+    };
+
+    //The snake is now keyboard controllable
+    function snake_keyboard_controller(e) {
         var key = e.which;
         keycode = key;
-        //We will add another clause to prevent reverse gear
-        if (key == "37" && d != "right") d = "left";
-        else if (key == "38" && d != "down") d = "up";
-        else if (key == "39" && d != "left") d = "right";
-        else if (key == "40" && d != "up") d = "down";
+
         //space for pause
-        else if (key == "32"){
+        if (key == "32") {
             //Lets move the snake now using a timer which will trigger the paint function
             //every 60ms
-            if(game_on){
+            if (game_on) {
                 game_on = false;
                 clearInterval(game_loop);
             }
@@ -162,7 +198,14 @@ $(document).ready(function () {
                 game_loop = setInterval(paint, game_speed);
             }
         }
-        //The snake is now keyboard controllable
-    })
 
-})
+        if (game_on) {
+            //We will add another clause to prevent reverse gear
+            if (key == "37" && d != "right") d = "left";
+            else if (key == "38" && d != "down") d = "up";
+            else if (key == "39" && d != "left") d = "right";
+            else if (key == "40" && d != "up") d = "down";
+        }
+    }
+
+};
