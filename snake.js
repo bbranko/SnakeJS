@@ -8,10 +8,15 @@ $(document).ready(function () {
     var h = canvas.height;
 
     //Lets save the cell width in a variable for easy control
-    var cw = 10;
+    var cw = 20;
     var d;
     var food;
     var score;
+    var keycode;
+    var game_on = false;
+    var game_speed = 60;
+    var game_loop;
+
 
     //Lets create the snake now
     var snake_array; //an array of cells to make up the snake
@@ -23,10 +28,10 @@ $(document).ready(function () {
         //finally lets display the score
         score = 0;
 
-        //Lets move the snake now using a timer which will trigger the paint function
-        //every 60ms
+        //initial paint
+        game_on = false;
         if (typeof game_loop != "undefined") clearInterval(game_loop);
-        game_loop = setInterval(paint, 60);
+        paint();
     }
 
     init();
@@ -112,7 +117,9 @@ $(document).ready(function () {
         paint_cell(food.x, food.y);
         //Lets paint the score
         var score_text = "Score: " + score;
+        var keycode_text = "Keycode: " + keycode;
         ctx.fillText(score_text, 5, h - 5);
+        ctx.fillText(keycode_text, 5, h - 15);
     }
 
     //Lets first create a generic function to paint cells
@@ -136,11 +143,25 @@ $(document).ready(function () {
     //Lets add the keyboard controls now
     $(document).keydown(function (e) {
         var key = e.which;
+        keycode = key;
         //We will add another clause to prevent reverse gear
         if (key == "37" && d != "right") d = "left";
         else if (key == "38" && d != "down") d = "up";
         else if (key == "39" && d != "left") d = "right";
         else if (key == "40" && d != "up") d = "down";
+        //space for pause
+        else if (key == "32"){
+            //Lets move the snake now using a timer which will trigger the paint function
+            //every 60ms
+            if(game_on){
+                game_on = false;
+                clearInterval(game_loop);
+            }
+            else {
+                game_on = true;
+                game_loop = setInterval(paint, game_speed);
+            }
+        }
         //The snake is now keyboard controllable
     })
 
