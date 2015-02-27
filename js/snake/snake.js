@@ -3,15 +3,9 @@
 var snakejs = function () {
     //Canvas stuff
     var canvas = document.getElementById("canvas");
-    var ctx = canvas.getContext("2d");
-    var w = canvas.width;
-    var h = canvas.height;
     var gw = 45;
     var gh = 45;
 
-    //Lets save the cell width in a variable for easy control
-    var cw = w / gw;
-    var ch = h / gh;
     var food;
     var score;
     var keycode;
@@ -89,7 +83,7 @@ var snakejs = function () {
         function paint() {
             for (var i = 0; i < snake_array.length; i++) {
                 var c = snake_array[i];
-                paint_cell(c.x, c.y);
+                playground.paint_cell(c.x, c.y);
             }
         }
 
@@ -118,8 +112,64 @@ var snakejs = function () {
     }());
 
     var playground = (function () {
+        var ctx;
+        var pg_width; //number of fields horizontally (or number of columns)
+        var pg_height; //number of fields vertically (or number of rows)
 
-        //food
+        var w; //width
+        var h; //height
+
+        //Lets save the cell width in a variable for easy control
+        var cw;
+        var ch;
+
+        function init(canvas, gw, gh) {
+            ctx = canvas.getContext("2d");
+            pg_width = gw;
+            pg_height = gh;
+
+            w = canvas.width;
+            h = canvas.height;
+
+            //Lets save the cell width in a variable for easy control
+            cw = w / pg_width;
+            ch = h / pg_height;
+        }
+
+        function paint() {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, w, h);
+            ctx.strokeStyle = 'black';
+            ctx.strokeRect(0, 0, w, h);
+        }
+
+        //generic function to paint cells
+        function paint_cell(x, y) {
+            ctx.fillStyle = 'blue';
+            ctx.fillRect(x * cw, y * ch, cw, ch);
+            ctx.strokeStyle = 'white';
+            ctx.strokeRect(x * cw, y * ch, cw, ch);
+        }
+
+        //fixme: add out of bounds draw prevention
+        function paint_text(text, x, y){
+            if(!text) return;
+
+            x = x || 1;
+            y = y || 1;
+
+            if(x<0) x += w;
+            if(y<0) y += h;
+
+            ctx.fillText(text, x, y);
+        }
+
+        return {
+            'init': init,
+            'paint': paint,
+            'paint_cell': paint_cell,
+            'paint_text': paint_text
+        }
     }());
 
     var game = (function () {
@@ -130,7 +180,7 @@ var snakejs = function () {
     });
 
     function init() {
-
+        playground.init(canvas, gw, gh);
         snake.init(5);
         create_food(); //Now we can see the food particle
         //finally lets display the score
@@ -158,7 +208,7 @@ var snakejs = function () {
     //Lets paint the snake now
     function paint() {
         //To avoid the snake trail we need to paint the BG on every frame
-        draw_playground();
+        playground.paint();
 
         //move snake
         snake.move();
@@ -173,28 +223,14 @@ var snakejs = function () {
         }
 
         //Lets paint the food
-        paint_cell(food.x, food.y);
+        playground.paint_cell(food.x, food.y);
         //Lets paint the score
         var score_text = 'Score: ' + score;
         var keycode_text = 'Keycode: ' + keycode;
-        ctx.fillText(score_text, 5, h - 5);
-        ctx.fillText(keycode_text, 5, h - 15);
+        playground.paint_text(score_text, 5, -5);
+        playground.paint_text(keycode_text, 5, -15);
     }
 
-    function draw_playground() {
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, w, h);
-        ctx.strokeStyle = 'black';
-        ctx.strokeRect(0, 0, w, h);
-    }
-
-    //Lets first create a generic function to paint cells
-    function paint_cell(x, y) {
-        ctx.fillStyle = 'blue';
-        ctx.fillRect(x * cw, y * ch, cw, ch);
-        ctx.strokeStyle = 'white';
-        ctx.strokeRect(x * cw, y * ch, cw, ch);
-    }
 
     function check_collision(x, y, array) {
         //This function will check if the provided x/y coordinates exist
