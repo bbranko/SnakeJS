@@ -28,7 +28,8 @@
         <script src="js/snake/snake.js" type="text/javascript"></script>
         <script type="application/javascript">
             $(document).ready(function(){
-                snakejs();
+                //input: canvas, game_width, game_height, game_speed
+                snakejs.create_new(document.getElementById("canvas"), 45, 45, 60);
             });
         </script>
     </body>
