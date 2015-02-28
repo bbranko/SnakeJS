@@ -1,4 +1,9 @@
-//"use strict";
+"use strict";
+
+/**
+ * based on: http://thecodeplayer.com/walkthrough/html5-game-tutorial-make-a-snake-game-using-html5-canvas-jquery
+ * upgraded by: Branko Bavrljic
+ */
 
 var snakejs = (function () {
 
@@ -330,11 +335,3 @@ var snakejs = (function () {
     }());
 
 }());
-
-/*
- move intention
- > new head to be
- >> check hit
- >> check food
- >>> move
- * */
