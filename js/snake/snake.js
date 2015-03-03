@@ -188,7 +188,10 @@ var snakejs = (function () {
             game_height = gh || 45;
             game_speed = gs || 60;
 
-            //Lets add the keyboard controls now, via chaining!
+            //Lets add the keyboard controls
+            document.body.removeEventListener('scroll', keyboard_controller, false)
+            document.body.addEventListener('scroll', keyboard_controller, false);
+
             if (!old_document_keydown) {
                 old_document_keydown = document.onkeydown;
                 document.onkeydown = function (e) {
@@ -214,11 +217,7 @@ var snakejs = (function () {
         }
 
         function end() {
-            //restore page's keydown
-            if (!!old_document_keydown) {
-                document.onkeydown = old_document_keydown;
-            }
-
+            document.body.removeEventListener('scroll', keyboard_controller, false);
             if (typeof game_loop != 'undefined') clearInterval(game_loop);
         }
 
