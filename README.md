@@ -7,9 +7,9 @@ Enjoy!
 ## Stuff done:
  - dropped jQuery
  - split code into sub-modules within one file
+ - split snake.js into separate files via loose augmentation, BUT with keeping private stuff still private
 
 ## To be done:
- - split snake.js into separate files via loose augmentation, BUT with keeping private stuff still private
  - more game logic, ie speed up with score and time ++
  - add some control buttons to set initial state
  - AI?
