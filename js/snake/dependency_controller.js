@@ -10,7 +10,7 @@ var SnakeJs = (function (my) {
     var _private = my._private = my._private || {};
     _private.dependencies = _private.dependencies || {};
 
-    var DEPENDENCY_AMOUNT = 5; //keep this number in check.
+    var DEPENDENCY_AMOUNT = 4; //keep this number in check.
 
 
     if (!_private.dependencies.dependency_controler) {
@@ -34,6 +34,7 @@ var SnakeJs = (function (my) {
             var dep_len = Object.keys(_private.dependencies).length;
             if (dep_len === DEPENDENCY_AMOUNT) {
                 _seal();
+                my.loaded = true;
             } else {
                 if (dep_len > DEPENDENCY_AMOUNT) {
                     throw 'Dependency management broke for SnakeJs';
@@ -42,6 +43,7 @@ var SnakeJs = (function (my) {
         };
 
         (!!_private.LOCK_UP) ? _private.LOCK_UP() : null;
+
     }
 
 
