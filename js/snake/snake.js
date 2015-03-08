@@ -28,7 +28,7 @@ var snakejs = (function () {
         //FIXME add is_alive checks before any action!
         //snake movement logic
         function move() {
-            //Pop out the tail cell and place it infront of the head cell
+            //Pop out the tail cell and place it in front of the head cell
             var nx = snake_array[0].x;
             var ny = snake_array[0].y;
 
@@ -163,7 +163,6 @@ var snakejs = (function () {
     }());
 
     var game = (function () {
-        var old_document_keydown = null;
         var game_canvas;
         var game_width;
         var game_height;
@@ -189,16 +188,8 @@ var snakejs = (function () {
             game_speed = gs || 60;
 
             //Lets add the keyboard controls
-            document.body.removeEventListener('scroll', keyboard_controller, false)
-            document.body.addEventListener('scroll', keyboard_controller, false);
-
-            if (!old_document_keydown) {
-                old_document_keydown = document.onkeydown;
-                document.onkeydown = function (e) {
-                    keyboard_controller(e);
-                    if (old_document_keydown) old_document_keydown(e);
-                };
-            }
+            document.body.removeEventListener('keydown', keyboard_controller, false);
+            document.body.addEventListener('keydown', keyboard_controller, false);
 
             restart()
         }
@@ -217,7 +208,7 @@ var snakejs = (function () {
         }
 
         function end() {
-            document.body.removeEventListener('scroll', keyboard_controller, false);
+            document.body.removeEventListener('keydown', keyboard_controller, false);
             if (typeof game_loop != 'undefined') clearInterval(game_loop);
         }
 
