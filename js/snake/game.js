@@ -20,8 +20,10 @@ var SnakeJs = (function (my) {
             var score;
             var keycode;
             var game_on;
+            var game_loop_timeout;
+
+            // current game speed, note: lower is faster. Will be renaming it soon to clear out confusion.
             var game_speed;
-            var game_loop;
 
             //note: game width height represents number of playground pixels and not actual canvas px size
             //canvas size is defined beforehand and the game is rendered within it
@@ -52,31 +54,34 @@ var SnakeJs = (function (my) {
                 score = 0;
 
                 //initial paint
-                if (typeof game_loop != 'undefined') clearInterval(game_loop);
+                if (typeof game_loop_timeout != 'undefined') clearTimeout(game_loop_timeout);
                 paint();
             }
 
             function end() {
                 document.body.removeEventListener('keydown', keyboard_controller, false);
-                if (typeof game_loop != 'undefined') clearInterval(game_loop);
+                if (typeof game_loop != 'undefined') clearTimeout(game_loop);
+            }
+
+            function game_loop() {
+
+                //move snake
+                _private.snake.move();
+                //if it survives,
+                if (_private.snake.isAlive()) {
+                    paint(); //game continues
+                    game_loop_timeout = setTimeout(game_loop, game_speed);
+                } else {
+                    restart(); //otherwise, game over
+                }
+
             }
 
             //Lets paint the snake now
             function paint() {
                 //To avoid the snake trail we need to paint the BG on every frame
                 _private.playground.paint();
-
-                //move snake
-                _private.snake.move();
-                //if it survives,
-                if (_private.snake.isAlive()) {
-                    //game continues
-                    _private.snake.paint()
-                } else {
-                    //otherwise, game over
-                    restart();
-                    return;
-                }
+                _private.snake.paint();
 
                 //Lets paint the food
                 _private.playground.paint_cell(food.x, food.y);
@@ -94,15 +99,13 @@ var SnakeJs = (function (my) {
 
                 //space for pause
                 if (key == '32') {
-                    //Lets move the snake now using a timer which will trigger the paint function
-                    //every 60ms
                     if (game_on) {
                         game_on = false;
-                        clearInterval(game_loop);
+                        clearTimeout(game_loop_timeout);
                     }
                     else {
                         game_on = true;
-                        game_loop = setInterval(paint, game_speed);
+                        game_loop_timeout = setTimeout(game_loop, game_speed);
                     }
                 }
 
