@@ -17,12 +17,13 @@ var SnakeJs = (function (my) {
         // all hail snake control object!
         _private.snake = (function () {
             var snake_array; //an array of cells to make up the snake
-            var direction; // string, one of: left, right, up or down
+            var current_direction;
+            var new_direction; // string, one of: left, right, up or down
             var is_alive;
 
             function init(length) {
                 length = length || 5; //default length of the snake
-                direction = "right"; //also set default direction of movement
+                current_direction = new_direction = "right"; //also set default direction of movement
                 is_alive = true; //raise da snake from the grips of dooom
 
                 snake_array = []; //Empty array to start with
@@ -42,10 +43,11 @@ var SnakeJs = (function (my) {
                 //These were the position of the head cell.
                 //We will increment it to get the new head position
                 //Lets add proper direction based movement now
-                if (direction == "right") nx++;
-                else if (direction == "left") nx--;
-                else if (direction == "up") ny--;
-                else if (direction == "down") ny++;
+                updateDirection();
+                if (current_direction == "right") nx++;
+                else if (current_direction == "left") nx--;
+                else if (current_direction == "up") ny--;
+                else if (current_direction == "down") ny++;
 
                 //Lets add the game over clauses now
                 //This will restart the game if the snake hits the wall
@@ -88,14 +90,18 @@ var SnakeJs = (function (my) {
                 return !!is_alive;
             }
 
-            function setDirection(d) {
+            function updateDirection() {
                 //suicide prevention
-                if ((direction === 'left' && d != 'right')
-                    || (direction === 'up' && d != 'down')
-                    || (direction === 'right' && d != 'left')
-                    || (direction === 'down' && d != 'up'))
+                if ((current_direction === 'left' && new_direction != 'right')
+                    || (current_direction === 'up' && new_direction != 'down')
+                    || (current_direction === 'right' && new_direction != 'left')
+                    || (current_direction === 'down' && new_direction != 'up'))
 
-                    direction = d;
+                    current_direction = new_direction;
+            }
+
+            function setDirection(d) {
+                new_direction = d;
             }
 
             //expose snake api
